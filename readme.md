@@ -5,7 +5,8 @@ Steps to install project:
 2. Open the project directory ```cd ylab-project```
 3. Copy .env.example file ```cp .env.example .env```
 4. Install composer dependencies ```composer install```
-5. Import database dump in project directory ylab.sql
-6. Run command ```php artisan key:generate```
-7. To start project type command ```php artisan serve```
-8. In browser type `http://localhost:8000`
+5. Import database dump in project directory `ylab.sql`
+6. Edit `.env` file with your database config
+7. Run command ```php artisan key:generate```
+8. To start project type command ```php artisan serve```
+9. In browser type `http://localhost:8000`
