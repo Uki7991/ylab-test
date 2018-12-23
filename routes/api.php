@@ -16,3 +16,8 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+//Datatables
+Route::get('users', 'UserController@getUsers')->name('datatable.getusers');
+Route::get('tasks', 'TaskController@getTasks')->name('datatable.gettasks');
+Route::get('statuses', 'StatusController@getStatuses')->name('datatable.getstatuses');

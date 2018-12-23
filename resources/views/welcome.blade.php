@@ -1,98 +1,87 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-        <title>Laravel</title>
+@section('content')
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
+    <div class="container">
+        <div class="row">
+            @include('partials.filter')
 
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Nunito', sans-serif;
-                font-weight: 200;
-                height: 100vh;
-                margin: 0;
-            }
 
-            .full-height {
-                height: 100vh;
-            }
+            @foreach($tasks as $task)
+                <div class="col-4 my-2">
+                    <div class="card">
+                        <div class="card-header" style="border-top: 5px solid {{ $task->status->color }};">
+                            Task #{{ $task->id }}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $task->name }}</h5>
+                            <p class="card-text">{{ str_limit($task->description, 130, '...') }}</p>
+                            <div class="d-flex align-items-center">
+                                <a href="#" onclick="event.preventDefault()" class="btn btn-sm btn-primary task" data-id="{{ $task->id }}" data-toggle="modal" data-target="#task-modal">Details</a>
 
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
-                        @endif
-                    @endauth
+                                <form class="col-auto ml-auto pr-0 form-inline" action="{{ route('task.update', $task) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="name" value="{{ $task->name }}">
+                                    <input type="hidden" name="description" value="{{ $task->description }}">
+                                    <input type="hidden" name="end_date" value="{{ $task->end_date }}">
+                                    <input type="hidden" name="change_status" value="1">
+                                    <select name="status_id" class="form-control form-control-sm">
+                                        @foreach($statuses as $status)
+                                            <option value="{{ $status->id }}" {{ $task->status->id === $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm ml-2">Change status</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @endif
+            @endforeach
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
-            </div>
         </div>
-    </body>
-</html>
+    </div>
+
+    @include('partials.task-modal')
+@endsection
+
+@push('stylesheets')
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+@endpush
+
+@push('scripts')
+    <script>
+        $('#task-modal').on('show.bs.modal', function (e) {
+            let btn = $(e.relatedTarget);
+            let id = btn.data('id');
+
+            console.log(id);
+            $.ajax({
+                url: '/task/'+id,
+                success: data => {
+                    appendDataToModal(data.task)
+                },
+                error: () => {
+                    console.log('error');
+                }
+            });
+
+            function appendDataToModal(task) {
+                console.log(task)
+                $('#task-title').html(task.name);
+                $('#status').html(task.status.name);
+                $('#task-desc').html(task.description);
+                $('#created-at').html(dateFormat(task.created_at));
+                $('#deadline').html(dateFormat(task.end_date));
+                $('.modal-header').css('border-bottom', '5px solid '+task.status.color);
+            }
+
+            function dateFormat(d) {
+                let date = new Date(d);
+
+                return date.getUTCDay()+'/'+date.getMonth()+'/'+date.getFullYear();
+            }
+        })
+    </script>
+@endpush
