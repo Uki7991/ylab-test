@@ -34,3 +34,5 @@ Route::resource('status', 'StatusController')->only([
 Route::resource('task', 'TaskController')->only([
     'show', 'update'
 ]);
+
+Route::get('/about', 'HomeController@about')->name('about');

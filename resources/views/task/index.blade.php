@@ -43,7 +43,7 @@
                     { data: 'created_at', name: 'created_at' },
                     { data: 'updated_at', name: 'updated_at' },
                     { data: 'end_date', name: 'end_date' },
-                    { data: 'status.name', name: 'status.name' },
+                    { data: 'status.name', name: 'status.name', searchable: false, orderable: false },
                     { data: 'action', name: 'action', orderable: false, searchable: false }
                 ]
             });

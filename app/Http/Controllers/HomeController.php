@@ -47,4 +47,9 @@ class HomeController extends Controller
             'field' => $request->query('field'),
         ]);
     }
+
+    public function about()
+    {
+        return view('about');
+    }
 }
